@@ -1,8 +1,9 @@
-const { prefix } = require("./../utils/config.json");
-const { onMessagePermissionCheck } = require("./../utils/permissions");
+const { MessageEmbed } = require('discord.js');
+const { prefix } = require('./../utils/config.json');
+const { onInitPermissionCheck } = require('./../utils/permissions');
 
 module.exports = {
-	event: "message",
+	event: 'message',
 	run: async (message, client) => {
 		if (!message.content.startsWith(prefix) || message.author.bot) return;
 		const args = message.content.slice(prefix.length).split(/ +/);
@@ -12,8 +13,10 @@ module.exports = {
 			client.commands.find(
 				(cmd) => cmd.aliases && cmd.aliases.includes(commandName)
 			);
+
 		if (!command) return;
-		if (command.guildOnly && message.channel.type !== "text") {
+
+		if (command.guildOnly && message.channel.type !== 'text') {
 			return message.reply("I can't execute that command inside DMs!");
 		}
 
@@ -25,25 +28,29 @@ module.exports = {
 			return message.channel.send(reply);
 		}
 
-		if (
-			command.permissions &&
-			(command.permissions.bot || command.permissions.user)
-		) {
+		let user = await message.guild.members.cache.get(message.author.id),
+			bot = await message.guild.members.cache.get(client.user.id);
+
+		if (command.permissions) {
 			if (!command.permissions.bot) command.permissions.bot = [];
 			if (!command.permissions.user) command.permissions.user = [];
-			let wasSuccessful = await onMessagePermissionCheck(
-				client,
-				message,
-				command
+			let hasPermission = await onInitPermissionCheck(
+				message.channel,
+				user,
+				bot,
+				command.permissions,
+				command.name
 			);
-			if (!wasSuccessful) return;
+			if (!hasPermission) {
+				return;
+			}
 		}
 
 		try {
 			command.execute(message, args, client);
 		} catch (error) {
 			console.error(error);
-			message.reply("There was an error trying to execute that command!");
+			message.reply('There was an error trying to execute that command!');
 		}
 	},
 };

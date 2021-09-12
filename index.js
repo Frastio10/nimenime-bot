@@ -8,11 +8,11 @@ client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 
 fs.readdir('./events/', (err, files) => {
-	const eventHandler = require('./handlers/EventHandler');
+	const eventHandler = require('./handler/eventHandler.js');
 	eventHandler(err, files, client);
 });
 fs.readdir('./commands/', (err, files) => {
-	const commandHandler = require('./handlers/CommandHandler');
+	const commandHandler = require('./handler/commandHandler.js');
 	commandHandler(err, files, client);
 });
 

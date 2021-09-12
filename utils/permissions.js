@@ -83,7 +83,7 @@ onMessagePermissionCheck = async (client, message, command) => {
 		command.permissions,
 		typeSets.users
 	);
-    
+
 	if (!permissions.bot.includes("SEND_MESSAGES"))
 		permissions.bot.push("SEND_MESSAGES");
 	if (!permissions.bot.includes("EMBED_LINKS"))
